@@ -1,8 +1,9 @@
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from django.test import LiveServerTestCase
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
 	def setUp(self):
 		self.browser = webdriver.Chrome()
@@ -19,7 +20,7 @@ class NewVisitorTest(unittest.TestCase):
 	def test_can_start_adding_entrees_and_view_them_later(self):
 		# User wants to add a new entree that they learned how to cook.
 		# They fire up their browser and navigate to the MealPlan site.
-		self.browser.get('http://localhost:8000')
+		self.browser.get(self.live_server_url)
 
 		# User notices page title and header mention MealPlan
 		self.assertIn('MealPlan', self.browser.title)
@@ -59,6 +60,3 @@ class NewVisitorTest(unittest.TestCase):
 
 		self.fail('Finish the test!')
 		# Satisfied, user closes browser.
-
-if __name__ == '__main__':
-	unittest.main()
