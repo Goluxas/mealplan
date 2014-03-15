@@ -38,7 +38,8 @@ class NewVisitorTest(unittest.TestCase):
 		table = self.browser.find_element_by_id('id_entree_table')
 		rows = table.find_elements_by_tag_name('tr')
 		self.assertTrue(
-				any(row.text == 'Cheese Omelette' for row in rows)
+				any(row.text == 'Cheese Omelette' for row in rows),
+				"New entree did not appear in table",
 		)
 
 		# Text box remains. User also types "Chicken Fajitas" and confirms.
