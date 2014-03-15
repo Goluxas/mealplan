@@ -4,8 +4,12 @@
 	</head>
 	<body>
 		<h1>MealPlan</h1>
-		<input id="id_new_entree" placeholder="Enter an entree" />
+		<form method="POST">
+			{% csrf_token %}
+			<input name="entree_name" id="id_new_entree" placeholder="Enter an entree" />
+		</form>
 		<table id="id_entree_table">
+			<tr><td>{{ new_entree_name }}</td></tr>
 		</table>
 	</body>
 </html>

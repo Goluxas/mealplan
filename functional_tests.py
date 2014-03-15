@@ -37,15 +37,19 @@ class NewVisitorTest(unittest.TestCase):
 
 		table = self.browser.find_element_by_id('id_entree_table')
 		rows = table.find_elements_by_tag_name('tr')
-		self.assertTrue(
-				any(row.text == 'Cheese Omelette' for row in rows),
-				"New entree did not appear in table",
-		)
+		self.assertIn('Cheese Omelette', [row.text for row in rows])
 
 		# Text box remains. User also types "Chicken Fajitas" and confirms.
+		inputbox = self.browser.find_element_by_id('id_new_entree')
+		inputbox.send_keys('Chicken Fajitas')
+		inputbox.send_keys(Keys.ENTER)
 
 		# Page updates, now shows both Cheese Omelette and
 		# "Chicken Fajitas (entree)"
+		table = self.browser.find_element_by_id('id_entree_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertIn('Cheese Omelette', [row.text for row in rows])
+		self.assertIn('Chicken Fajitas', [row.text for row in rows])
 
 		# User wonders if they can get back to this later. Some text on the
 		# page mentions that a unique URL has been generated to allow that.
