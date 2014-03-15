@@ -11,6 +11,11 @@ class NewVisitorTest(unittest.TestCase):
 	def tearDown(self):
 		self.browser.quit()
 
+	def check_for_row_in_entree_table(self, row_text):
+		table = self.browser.find_element_by_id('id_entree_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertIn(row_text, [row.text for row in rows])
+
 	def test_can_start_adding_entrees_and_view_them_later(self):
 		# User wants to add a new entree that they learned how to cook.
 		# They fire up their browser and navigate to the MealPlan site.
@@ -35,9 +40,7 @@ class NewVisitorTest(unittest.TestCase):
 		# "Cheese Omelette (entree)"
 		inputbox.send_keys(Keys.ENTER)
 
-		table = self.browser.find_element_by_id('id_entree_table')
-		rows = table.find_elements_by_tag_name('tr')
-		self.assertIn('Cheese Omelette', [row.text for row in rows])
+		self.check_for_row_in_entree_table('Cheese Omelette')
 
 		# Text box remains. User also types "Chicken Fajitas" and confirms.
 		inputbox = self.browser.find_element_by_id('id_new_entree')
@@ -46,10 +49,8 @@ class NewVisitorTest(unittest.TestCase):
 
 		# Page updates, now shows both Cheese Omelette and
 		# "Chicken Fajitas (entree)"
-		table = self.browser.find_element_by_id('id_entree_table')
-		rows = table.find_elements_by_tag_name('tr')
-		self.assertIn('Cheese Omelette', [row.text for row in rows])
-		self.assertIn('Chicken Fajitas', [row.text for row in rows])
+		self.check_for_row_in_entree_table('Cheese Omelette')
+		self.check_for_row_in_entree_table('Chicken Fajitas')
 
 		# User wonders if they can get back to this later. Some text on the
 		# page mentions that a unique URL has been generated to allow that.
