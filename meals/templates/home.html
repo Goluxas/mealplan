@@ -9,7 +9,9 @@
 			<input name="entree_name" id="id_new_entree" placeholder="Enter an entree" />
 		</form>
 		<table id="id_entree_table">
-			<tr><td>{{ new_entree_name }}</td></tr>
+			{% for e in entrees %}
+				<tr><td>{{ e.name }}</td></tr>
+			{% endfor %}
 		</table>
 	</body>
 </html>
