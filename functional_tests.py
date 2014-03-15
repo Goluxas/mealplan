@@ -1,5 +1,6 @@
 import unittest
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 class NewVisitorTest(unittest.TestCase):
 
@@ -17,13 +18,28 @@ class NewVisitorTest(unittest.TestCase):
 
 		# User notices page title and header mention MealPlan
 		self.assertIn('MealPlan', self.browser.title)
+		header_text = self.browser.find_element_by_tag_name('h1').text
+		self.assertIn('MealPlan', header_text)
 
 		# User is presented with the option to add an entree right away
+		inputbox = self.browser.find_element_by_id('id_new_entree')
+		self.assertEqual(
+				inputbox.get_attribute('placeholder'),
+				'Enter an entree'
+		)
 
 		# User types "Cheese Omelette" into the text box
+		inputbox.send_keys('Cheese Omelette')
 
 		# When user hits enter, page updates and now lists
 		# "Cheese Omelette (entree)"
+		inputbox.send_keys(Keys.ENTER)
+
+		table = self.browser.find_element_by_id('id_entree_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertTrue(
+				any(row.text == 'Cheese Omelette' for row in rows)
+		)
 
 		# Text box remains. User also types "Chicken Fajitas" and confirms.
 
