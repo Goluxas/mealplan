@@ -62,22 +62,22 @@ class NewVisitorTest(LiveServerTestCase):
 
 		# Scott visits the home page. There's no sign of Mallory's meals.
 		self.browser.get(self.live_server_url)
-		page_text = self.browser.find_element_by_tag_name('body')
+		page_text = self.browser.find_element_by_tag_name('body').text
 		self.assertNotIn('Cheese Omelette', page_text)
 		self.assertNotIn('Chicken Fajitas', page_text)
 
 		# Scott enters his first entree, starting a new meal collection
-		inputbox = self.browser.get_element_by_id('id_new_entree')
+		inputbox = self.browser.find_element_by_id('id_new_entree')
 		inputbox.send_keys('PB&J')
 		inputbox.send_keys(Keys.ENTER)
 
 		# Scott gets his own unique URL
-		scott_meals_url = self.broswer.current_url
+		scott_meals_url = self.browser.current_url
 		self.assertRegex(scott_meals_url, '/meals/.+')
 		self.assertNotEqual(scott_meals_url, mallory_meals_url)
 
 		# Again there's no sign of Mallory's meals
-		page_text = self.browser.find_element_by_tag_name('body')
+		page_text = self.browser.find_element_by_tag_name('body').text
 		self.assertNotIn('Cheese Omelette', page_text)
 		self.assertIn('PB&J', page_text)
 

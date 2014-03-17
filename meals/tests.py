@@ -37,7 +37,7 @@ class HomePageTest(TestCase):
 		response = home_page(request)
 
 		self.assertEqual(response.status_code, 302) #redirect
-		self.assertEqual(response['location'], '/')
+		self.assertEqual(response['location'], '/meals/the-only-mealplan-in-the-world')
 
 	def test_home_page_only_saves_items_when_necessary(self):
 		request = HttpRequest()
@@ -46,16 +46,6 @@ class HomePageTest(TestCase):
 
 		self.assertEqual(Entree.objects.count(), 0)
 
-	def test_home_page_displays_all_list_items(self):
-		Entree.objects.create(name='ent1')
-		Entree.objects.create(name='ent2')
-
-		request = HttpRequest()
-		response = home_page(request)
-
-		self.assertIn('ent1', response.content.decode())
-		self.assertIn('ent2', response.content.decode())
-		
 
 class EntreeModelTest(TestCase):
 
@@ -75,3 +65,19 @@ class EntreeModelTest(TestCase):
 		second_saved_entree = saved_entrees[1]
 		self.assertEqual(first_saved_entree.name, 'The first (ever) entree')
 		self.assertEqual(second_saved_entree.name, 'Second entree')
+
+
+class MealsViewTest(TestCase):
+
+	def test_uses_meals_template(self):
+		response = self.client.get('/meals/the-only-mealplan-in-the-world/')
+		self.assertTemplateUsed(response, 'meals.html')
+
+	def test_displays_all_meal_items(self):
+		Entree.objects.create(name='ent1')
+		Entree.objects.create(name='ent2')
+
+		response = self.client.get('/meals/the-only-mealplan-in-the-world/')
+
+		self.assertContains(response, 'ent1')
+		self.assertContains(response, 'ent2')

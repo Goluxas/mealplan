@@ -4,9 +4,9 @@ from django.conf.urls import patterns, include, url
 #admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
     url(r'^$', 'meals.views.home_page', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+	url(r'^meals/the-only-mealplan-in-the-world/$', 'meals.views.view_meals', name='view_meals'),
+
 
     #url(r'^admin/', include(admin.site.urls)),
 )
