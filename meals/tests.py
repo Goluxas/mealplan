@@ -52,18 +52,30 @@ class EntreeAndArsenalModelTest(TestCase):
 class MealsViewTest(TestCase):
 
 	def test_uses_meals_template(self):
-		response = self.client.get('/meals/the-only-mealplan-in-the-world/')
+		ars = Arsenal.objects.create()
+		response = self.client.get('/meals/%d/' % (ars.id))
 		self.assertTemplateUsed(response, 'meals.html')
 
-	def test_displays_all_meal_items(self):
-		ars = Arsenal.objects.create()
-		Entree.objects.create(name='ent1', arsenal=ars)
-		Entree.objects.create(name='ent2', arsenal=ars)
+	def test_displays_only_meals_for_that_arsenal(self):
+		correct_ars = Arsenal.objects.create()
+		Entree.objects.create(name='ent1', arsenal=correct_ars)
+		Entree.objects.create(name='ent2', arsenal=correct_ars)
+		wrong_ars = Arsenal.objects.create()
+		Entree.objects.create(name='other ent1', arsenal=wrong_ars)
+		Entree.objects.create(name='other ent2', arsenal=wrong_ars)
 
-		response = self.client.get('/meals/the-only-mealplan-in-the-world/')
+		response = self.client.get('/meals/%d/' % (correct_ars.id))
 
 		self.assertContains(response, 'ent1')
 		self.assertContains(response, 'ent2')
+		self.assertNotContains(response, 'other ent1')
+		self.assertNotContains(response, 'other ent2')
+
+	def test_passes_correct_arsenal_to_template(self):
+		other_ars = Arsenal.objects.create()
+		correct_ars = Arsenal.objects.create()
+		response = self.client.get('/meals/%d/' % (correct_ars.id))
+		self.assertEqual(response.context['arsenal'], correct_ars)
 
 
 class NewMealsTest(TestCase):
@@ -77,5 +89,32 @@ class NewMealsTest(TestCase):
 
 	def test_redirects_after_POST(self):
 		response = self.client.post('/meals/new', data={'entree_name': 'A new entree name'})
+		new_ars = Arsenal.objects.first()
 
-		self.assertRedirects(response, '/meals/the-only-mealplan-in-the-world/')
+		self.assertRedirects(response, '/meals/%d/' % (new_ars.id))
+
+
+class NewEntreeTest(TestCase):
+
+	def test_can_save_a_POST_request_to_an_existsing_arsenal(self):
+		other_ars = Arsenal.objects.create()
+		correct_ars = Arsenal.objects.create()
+
+		self.client.post('/meals/%d/new_entree' % (correct_ars.id),
+				data={'entree_name': 'New entree for existing Arsenal'}
+		)
+
+		self.assertEqual(Entree.objects.count(), 1)
+		new_entree = Entree.objects.first()
+		self.assertEqual(new_entree.name, 'New entree for existing Arsenal')
+		self.assertEqual(new_entree.arsenal, correct_ars)
+
+	def test_redirects_to_meals_view(self):
+		other_ars = Arsenal.objects.create()
+		correct_ars = Arsenal.objects.create()
+
+		response = self.client.post('/meals/%d/new_entree' % (correct_ars.id),
+				data={'entree_name': 'New entree for existing Arsenal'}
+		)
+
+		self.assertRedirects(response, '/meals/%d/' % (correct_ars.id))

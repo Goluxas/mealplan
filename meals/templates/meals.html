@@ -4,13 +4,13 @@
 	</head>
 	<body>
 		<h1>MealPlan</h1>
-		<form method="POST" action="/meals/new">
+		<form method="POST" action="/meals/{{ arsenal.id }}/new_entree">
 			{% csrf_token %}
 			<input name="entree_name" id="id_new_entree" placeholder="Enter an entree" />
 		</form>
 		<table id="id_entree_table">
-			{% for e in entrees %}
-				<tr><td>{{ e.name }} (entree)</td></tr>
+			{% for entree in arsenal.entree_set.all %}
+				<tr><td>{{ entree.name }} (entree)</td></tr>
 			{% endfor %}
 		</table>
 	</body>

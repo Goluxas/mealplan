@@ -6,12 +6,18 @@ from meals.models import Entree, Arsenal
 def home_page(request):
 	return render(request, 'home.html')
 
-def view_meals(request):
+def view_meals(request, arsenal_id):
+	ars = Arsenal.objects.get(id=arsenal_id)
 	return render(request, 'meals.html', {
-				'entrees': Entree.objects.all(),
+				'arsenal': ars,
 			})
 
 def new_meals(request):
 	ars = Arsenal.objects.create()
 	Entree.objects.create(name=request.POST['entree_name'], arsenal=ars)
-	return redirect('/meals/the-only-mealplan-in-the-world/')
+	return redirect('/meals/%d/' % (ars.id))
+
+def add_entree(request, arsenal_id):
+	ars = Arsenal.objects.get(id=arsenal_id)
+	Entree.objects.create(name=request.POST['entree_name'], arsenal=ars)
+	return redirect('/meals/%d/' % (ars.id))

@@ -82,4 +82,3 @@ class NewVisitorTest(LiveServerTestCase):
 		self.assertIn('PB&J', page_text)
 
 		# Satisfied, user closes browser.
-		self.fail('Finish the test!')
