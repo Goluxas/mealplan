@@ -54,7 +54,7 @@ class MealsViewTest(TestCase):
 	def test_uses_meals_template(self):
 		ars = Arsenal.objects.create()
 		response = self.client.get('/meals/%d/' % (ars.id))
-		self.assertTemplateUsed(response, 'meals.html')
+		self.assertTemplateUsed(response, 'arsenal.html')
 
 	def test_displays_only_meals_for_that_arsenal(self):
 		correct_ars = Arsenal.objects.create()
