@@ -1,5 +1,5 @@
 Dependencies:
 
-python-2.7
-django
+python-3.2 or higher
+django-1.6 or higher
 selenium
