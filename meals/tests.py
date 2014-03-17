@@ -18,34 +18,6 @@ class HomePageTest(TestCase):
 		expected_html = render_to_string('home.html')
 		self.assertEqual(response.content.decode(), expected_html)
 
-	def test_home_page_can_save_a_POST_request(self):
-		request = HttpRequest()
-		request.method = 'POST'
-		request.POST['entree_name'] = 'A new entree name'
-
-		response = home_page(request)
-
-		self.assertEqual(Entree.objects.count(), 1)
-		new_entree = Entree.objects.first()
-		self.assertEqual(new_entree.name, 'A new entree name')
-
-	def test_home_page_redirects_after_POST(self):
-		request = HttpRequest()
-		request.method = 'POST'
-		request.POST['entree_name'] = 'A new entree name'
-
-		response = home_page(request)
-
-		self.assertEqual(response.status_code, 302) #redirect
-		self.assertEqual(response['location'], '/meals/the-only-mealplan-in-the-world')
-
-	def test_home_page_only_saves_items_when_necessary(self):
-		request = HttpRequest()
-
-		home_page(request)
-
-		self.assertEqual(Entree.objects.count(), 0)
-
 
 class EntreeModelTest(TestCase):
 
@@ -81,3 +53,18 @@ class MealsViewTest(TestCase):
 
 		self.assertContains(response, 'ent1')
 		self.assertContains(response, 'ent2')
+
+
+class NewMealsTest(TestCase):
+
+	def test_saving_a_POST_request(self):
+		self.client.post('/meals/new', data={'entree_name': 'A new entree name'})
+
+		self.assertEqual(Entree.objects.count(), 1)
+		new_entree = Entree.objects.first()
+		self.assertEqual(new_entree.name, 'A new entree name')
+
+	def test_redirects_after_POST(self):
+		response = self.client.post('/meals/new', data={'entree_name': 'A new entree name'})
+
+		self.assertRedirects(response, '/meals/the-only-mealplan-in-the-world/')

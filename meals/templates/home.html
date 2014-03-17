@@ -4,7 +4,7 @@
 	</head>
 	<body>
 		<h1>Start a new MealPlan</h1>
-		<form method="POST">
+		<form method="POST" action="/meals/new">
 			{% csrf_token %}
 			<input name="entree_name" id="id_new_entree" placeholder="Enter an entree" />
 		</form>
