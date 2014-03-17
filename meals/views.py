@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
-from meals.models import Entree
+from meals.models import Entree, Arsenal
 
 def home_page(request):
 	return render(request, 'home.html')
@@ -12,5 +12,6 @@ def view_meals(request):
 			})
 
 def new_meals(request):
-	Entree.objects.create(name=request.POST['entree_name'])
+	ars = Arsenal.objects.create()
+	Entree.objects.create(name=request.POST['entree_name'], arsenal=ars)
 	return redirect('/meals/the-only-mealplan-in-the-world/')
