@@ -1,9 +1,24 @@
+import sys
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from django.test import LiveServerTestCase
 
 class NewVisitorTest(LiveServerTestCase):
+
+	@classmethod
+	def setUpClass(cls):
+		for arg in sys.argv:
+			if 'liveserver' in arg:
+				cls.server_url = 'http://' + arg.split('=')[1]
+				return
+		LiveServerTestCase.setUpClass()
+		cls.server_url = cls.live_server_url
+
+	@classmethod
+	def tearDownClass(cls):
+		if cls.server_url == cls.live_server_url:
+			LiveServerTestCase.tearDownClass()
 
 	def setUp(self):
 		self.browser = webdriver.Chrome()
@@ -20,7 +35,7 @@ class NewVisitorTest(LiveServerTestCase):
 	def test_can_start_adding_entrees_and_view_them_later(self):
 		# Mallory wants to add a new entree that she learned how to cook.
 		# She fires up her browser and navigates to the MealPlan site.
-		self.browser.get(self.live_server_url)
+		self.browser.get(self.server_url)
 
 		# Mallory notices page title and header mention MealPlan
 		self.assertIn('MealPlan', self.browser.title)
@@ -61,7 +76,7 @@ class NewVisitorTest(LiveServerTestCase):
 		self.browser = webdriver.Chrome()
 
 		# Scott visits the home page. There's no sign of Mallory's meals.
-		self.browser.get(self.live_server_url)
+		self.browser.get(self.server_url)
 		page_text = self.browser.find_element_by_tag_name('body').text
 		self.assertNotIn('Cheese Omelette', page_text)
 		self.assertNotIn('Chicken Fajitas', page_text)
@@ -85,7 +100,7 @@ class NewVisitorTest(LiveServerTestCase):
 
 	def test_layout_and_styling(self):
 		# Mallory goes to the home page
-		self.browser.get(self.live_server_url)
+		self.browser.get(self.server_url)
 		self.browser.set_window_size(1024,768)
 
 		# She notices the input box is nicely centered
