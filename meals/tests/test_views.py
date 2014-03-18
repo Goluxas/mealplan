@@ -64,7 +64,7 @@ class NewMealsTest(TestCase):
 		self.assertRedirects(response, '/meals/%d/' % (new_ars.id))
 
 
-class NewEntreeTest(TestCase):
+class NewArsenalTest(TestCase):
 
 	def test_can_save_a_POST_request_to_an_existsing_arsenal(self):
 		other_ars = Arsenal.objects.create()
@@ -79,7 +79,7 @@ class NewEntreeTest(TestCase):
 		self.assertEqual(new_entree.name, 'New entree for existing Arsenal')
 		self.assertEqual(new_entree.arsenal, correct_ars)
 
-	def test_redirects_to_meals_view(self):
+	def test_redirects_to_arsenal_view(self):
 		other_ars = Arsenal.objects.create()
 		correct_ars = Arsenal.objects.create()
 
@@ -88,3 +88,15 @@ class NewEntreeTest(TestCase):
 		)
 
 		self.assertRedirects(response, '/meals/%d/' % (correct_ars.id))
+
+	def test_validation_errors_are_sent_back_to_home_page_template(self):
+		response = self.client.post('/meals/new', data={'entree_name':''})
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'home.html')
+		expected_error = 'Entree names must not be blank'
+		self.assertContains(response, expected_error)
+
+	def test_invalid_entrees_are_not_saved(self):
+		self.client.post('/meals/new', data={'entree_name':''})
+		self.assertEqual(Arsenal.objects.count(), 0)
+		self.assertEqual(Entree.objects.count(), 0)

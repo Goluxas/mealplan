@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 
 from meals.models import Entree, Arsenal
 
@@ -30,3 +31,10 @@ class EntreeAndArsenalModelTest(TestCase):
 		self.assertEqual(first_saved_entree.arsenal, arsenal)
 		self.assertEqual(second_saved_entree.name, 'Second entree')
 		self.assertEqual(second_saved_entree.arsenal, arsenal)
+
+	def test_cannot_save_empty_entrees(self):
+		ars = Arsenal.objects.create()
+		entree = Entree(arsenal=ars, name='')
+		with self.assertRaises(ValidationError):
+			entree.save()
+			entree.full_clean()
