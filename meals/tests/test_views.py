@@ -19,7 +19,7 @@ class HomePageTest(TestCase):
 		self.assertEqual(response.content.decode(), expected_html)
 
 
-class MealsViewTest(TestCase):
+class ArsenalViewTest(TestCase):
 
 	def test_uses_meals_template(self):
 		ars = Arsenal.objects.create()
@@ -47,8 +47,31 @@ class MealsViewTest(TestCase):
 		response = self.client.get('/meals/%d/' % (correct_ars.id))
 		self.assertEqual(response.context['arsenal'], correct_ars)
 
+	def test_can_save_a_POST_request_to_an_existsing_arsenal(self):
+		other_ars = Arsenal.objects.create()
+		correct_ars = Arsenal.objects.create()
 
-class NewMealsTest(TestCase):
+		self.client.post('/meals/%d/' % (correct_ars.id),
+				data={'entree_name': 'New entree for existing Arsenal'}
+		)
+
+		self.assertEqual(Entree.objects.count(), 1)
+		new_entree = Entree.objects.first()
+		self.assertEqual(new_entree.name, 'New entree for existing Arsenal')
+		self.assertEqual(new_entree.arsenal, correct_ars)
+
+	def test_POST_redirects_to_arsenal_view(self):
+		other_ars = Arsenal.objects.create()
+		correct_ars = Arsenal.objects.create()
+
+		response = self.client.post('/meals/%d/' % (correct_ars.id),
+				data={'entree_name': 'New entree for existing Arsenal'}
+		)
+
+		self.assertRedirects(response, '/meals/%d/' % (correct_ars.id))
+
+
+class NewArsenalTest(TestCase):
 
 	def test_saving_a_POST_request(self):
 		self.client.post('/meals/new', data={'entree_name': 'A new entree name'})
@@ -62,32 +85,6 @@ class NewMealsTest(TestCase):
 		new_ars = Arsenal.objects.first()
 
 		self.assertRedirects(response, '/meals/%d/' % (new_ars.id))
-
-
-class NewArsenalTest(TestCase):
-
-	def test_can_save_a_POST_request_to_an_existsing_arsenal(self):
-		other_ars = Arsenal.objects.create()
-		correct_ars = Arsenal.objects.create()
-
-		self.client.post('/meals/%d/new_entree' % (correct_ars.id),
-				data={'entree_name': 'New entree for existing Arsenal'}
-		)
-
-		self.assertEqual(Entree.objects.count(), 1)
-		new_entree = Entree.objects.first()
-		self.assertEqual(new_entree.name, 'New entree for existing Arsenal')
-		self.assertEqual(new_entree.arsenal, correct_ars)
-
-	def test_redirects_to_arsenal_view(self):
-		other_ars = Arsenal.objects.create()
-		correct_ars = Arsenal.objects.create()
-
-		response = self.client.post('/meals/%d/new_entree' % (correct_ars.id),
-				data={'entree_name': 'New entree for existing Arsenal'}
-		)
-
-		self.assertRedirects(response, '/meals/%d/' % (correct_ars.id))
 
 	def test_validation_errors_are_sent_back_to_home_page_template(self):
 		response = self.client.post('/meals/new', data={'entree_name':''})
