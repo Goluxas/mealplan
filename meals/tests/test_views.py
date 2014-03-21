@@ -52,7 +52,7 @@ class ArsenalViewTest(TestCase):
 		correct_ars = Arsenal.objects.create()
 
 		self.client.post('/meals/%d/' % (correct_ars.id),
-				data={'entree_name': 'New entree for existing Arsenal'}
+				data={'name': 'New entree for existing Arsenal'}
 		)
 
 		self.assertEqual(Entree.objects.count(), 1)
@@ -65,7 +65,7 @@ class ArsenalViewTest(TestCase):
 		correct_ars = Arsenal.objects.create()
 
 		response = self.client.post('/meals/%d/' % (correct_ars.id),
-				data={'entree_name': 'New entree for existing Arsenal'}
+				data={'name': 'New entree for existing Arsenal'}
 		)
 
 		self.assertRedirects(response, '/meals/%d/' % (correct_ars.id))
@@ -73,7 +73,7 @@ class ArsenalViewTest(TestCase):
 	def test_validation_errors_end_up_on_arsenal_page(self):
 		ars = Arsenal.objects.create()
 		response = self.client.post('/meals/%d/' % (ars.id),
-									data={'entree_name': ''})
+									data={'name': ''})
 
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'arsenal.html')
@@ -84,26 +84,26 @@ class ArsenalViewTest(TestCase):
 class NewArsenalTest(TestCase):
 
 	def test_saving_a_POST_request(self):
-		self.client.post('/meals/new', data={'entree_name': 'A new entree name'})
+		self.client.post('/meals/new', data={'name': 'A new entree name'})
 
 		self.assertEqual(Entree.objects.count(), 1)
 		new_entree = Entree.objects.first()
 		self.assertEqual(new_entree.name, 'A new entree name')
 
 	def test_redirects_after_POST(self):
-		response = self.client.post('/meals/new', data={'entree_name': 'A new entree name'})
+		response = self.client.post('/meals/new', data={'name': 'A new entree name'})
 		new_ars = Arsenal.objects.first()
 
 		self.assertRedirects(response, '/meals/%d/' % (new_ars.id))
 
 	def test_validation_errors_are_sent_back_to_home_page_template(self):
-		response = self.client.post('/meals/new', data={'entree_name':''})
+		response = self.client.post('/meals/new', data={'name':''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'home.html')
 		expected_error = escape('Entree names must not be blank')
 		self.assertContains(response, expected_error)
 
 	def test_invalid_entrees_are_not_saved(self):
-		self.client.post('/meals/new', data={'entree_name':''})
+		self.client.post('/meals/new', data={'name':''})
 		self.assertEqual(Arsenal.objects.count(), 0)
 		self.assertEqual(Entree.objects.count(), 0)

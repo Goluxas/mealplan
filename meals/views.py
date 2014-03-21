@@ -13,7 +13,7 @@ def view_arsenal(request, arsenal_id):
 	error = None
 
 	if request.method == 'POST':
-		entree = Entree(name=request.POST['entree_name'], arsenal=ars)
+		entree = Entree(name=request.POST['name'], arsenal=ars)
 		try:
 			entree.full_clean()
 			entree.save()
@@ -28,7 +28,7 @@ def view_arsenal(request, arsenal_id):
 
 def new_arsenal(request):
 	ars = Arsenal.objects.create()
-	entree = Entree(name=request.POST['entree_name'], arsenal=ars)
+	entree = Entree(name=request.POST['name'], arsenal=ars)
 	try:
 		entree.full_clean()
 		entree.save()

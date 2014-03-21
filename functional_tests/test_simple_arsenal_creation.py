@@ -20,7 +20,7 @@ class NewVisitorTest(FunctionalTest):
 		self.assertIn('MealPlan', header_text)
 
 		# Mallory is presented with the option to add an entree right away
-		inputbox = self.browser.find_element_by_id('id_new_entree')
+		inputbox = self.get_entree_input_box()
 		self.assertEqual(
 				inputbox.get_attribute('placeholder'),
 				'Enter an entree'
@@ -37,7 +37,7 @@ class NewVisitorTest(FunctionalTest):
 		self.check_for_row_in_entree_table('Cheese Omelette (entree)')
 
 		# Text box remains. Mallory also types "Chicken Fajitas" and confirms.
-		inputbox = self.browser.find_element_by_id('id_new_entree')
+		inputbox = self.get_entree_input_box()
 		inputbox.send_keys('Chicken Fajitas')
 		inputbox.send_keys(Keys.ENTER)
 
@@ -59,7 +59,7 @@ class NewVisitorTest(FunctionalTest):
 		self.assertNotIn('Chicken Fajitas', page_text)
 
 		# Scott enters his first entree, starting a new meal collection
-		inputbox = self.browser.find_element_by_id('id_new_entree')
+		inputbox = self.get_entree_input_box()
 		inputbox.send_keys('PB&J')
 		inputbox.send_keys(Keys.ENTER)
 
