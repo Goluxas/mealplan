@@ -6,7 +6,7 @@ from django.utils.html import escape
 
 from meals.views import home_page
 from meals.models import Entree, Arsenal
-from meals.forms import EntreeForm
+from meals.forms import EntreeForm, EMPTY_ENTREE_ERROR
 
 class HomePageTest(TestCase):
 	
@@ -70,15 +70,37 @@ class ArsenalViewTest(TestCase):
 
 		self.assertRedirects(response, '/meals/%d/' % (correct_ars.id))
 
-	def test_validation_errors_end_up_on_arsenal_page(self):
+	def test_displays_entree_form(self):
 		ars = Arsenal.objects.create()
-		response = self.client.post('/meals/%d/' % (ars.id),
-									data={'name': ''})
+		response = self.client.get('/meals/%d/' % (ars.id))
+		
+		self.assertIsInstance(response.context['form'], EntreeForm)
+		self.assertContains(response, 'name="name"')
+
+	def post_invalid_input(self):
+		ars = Arsenal.objects.create()
+		return self.client.post('/meals/%d/' % (ars.id), data={'name':''})
+
+	def test_for_invalid_input_nothing_saved_to_db(self):
+		self.post_invalid_input()
+
+		self.assertEqual(Entree.objects.count(), 0)
+	
+	def test_for_invalid_input_renders_arsenal_template(self):
+		response = self.post_invalid_input()
 
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'arsenal.html')
-		expected_error = escape('Entree names must not be blank')
-		self.assertContains(response, expected_error)
+
+	def test_for_invalid_input_passes_form_to_template(self):
+		response = self.post_invalid_input()
+
+		self.assertIsInstance(response.context['form'], EntreeForm)
+
+	def test_for_invalid_input_shows_error_on_page(self):
+		response = self.post_invalid_input()
+
+		self.assertContains(response, EMPTY_ENTREE_ERROR)
 
 
 class NewArsenalTest(TestCase):
@@ -96,12 +118,18 @@ class NewArsenalTest(TestCase):
 
 		self.assertRedirects(response, '/meals/%d/' % (new_ars.id))
 
-	def test_validation_errors_are_sent_back_to_home_page_template(self):
+	def test_for_invalid_input_renders_home_template(self):
 		response = self.client.post('/meals/new', data={'name':''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'home.html')
-		expected_error = escape('Entree names must not be blank')
-		self.assertContains(response, expected_error)
+		
+	def test_validation_errors_are_shown_on_home_page(self):
+		response = self.client.post('/meals/new', data={'name':''})
+		self.assertContains(response, EMPTY_ENTREE_ERROR)
+
+	def test_for_invalid_input_passes_form_to_template(self):
+		response = self.client.post('/meals/new', data={'name':''})
+		self.assertIsInstance(response.context['form'], EntreeForm)
 
 	def test_invalid_entrees_are_not_saved(self):
 		self.client.post('/meals/new', data={'name':''})

@@ -10,30 +10,24 @@ def home_page(request):
 
 def view_arsenal(request, arsenal_id):
 	ars = Arsenal.objects.get(id=arsenal_id)
-	error = None
+	form = EntreeForm()
 
 	if request.method == 'POST':
-		entree = Entree(name=request.POST['name'], arsenal=ars)
-		try:
-			entree.full_clean()
-			entree.save()
+		form = EntreeForm(request.POST)
+		if form.is_valid():
+			Entree.objects.create(name=request.POST['name'], arsenal=ars)
 			return redirect(ars)
-		except ValidationError:
-			error = 'Entree names must not be blank'
 
 	return render(request, 'arsenal.html', {
 				'arsenal': ars,
-				'error': error,
+				'form': form,
 			})
 
 def new_arsenal(request):
-	ars = Arsenal.objects.create()
-	entree = Entree(name=request.POST['name'], arsenal=ars)
-	try:
-		entree.full_clean()
-		entree.save()
-	except ValidationError:
-		ars.delete()
-		error = 'Entree names must not be blank'
-		return render(request, 'home.html', {'error':error})
-	return redirect(ars)
+	form = EntreeForm(data=request.POST)
+	if form.is_valid():
+		ars = Arsenal.objects.create()
+		Entree.objects.create(name=request.POST['name'], arsenal=ars)
+		return redirect(ars)
+	else:
+		return render(request, 'home.html', {'form':form})
