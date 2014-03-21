@@ -16,7 +16,7 @@ def view_arsenal(request, arsenal_id):
 		try:
 			entree.full_clean()
 			entree.save()
-			return redirect('/meals/%d/' % (ars.id))
+			return redirect(ars)
 		except ValidationError:
 			error = 'Entree names must not be blank'
 
@@ -35,4 +35,4 @@ def new_arsenal(request):
 		ars.delete()
 		error = 'Entree names must not be blank'
 		return render(request, 'home.html', {'error':error})
-	return redirect('/meals/%d/' % (ars.id))
+	return redirect(ars)

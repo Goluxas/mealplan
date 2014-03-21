@@ -38,3 +38,8 @@ class EntreeAndArsenalModelTest(TestCase):
 		with self.assertRaises(ValidationError):
 			entree.save()
 			entree.full_clean()
+
+	def test_get_absolute_url(self):
+		ars = Arsenal.objects.create()
+		
+		self.assertEqual(ars.get_absolute_url(), '/meals/%d/' % (ars.id))
