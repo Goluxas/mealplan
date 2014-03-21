@@ -3,9 +3,10 @@ from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 
 from meals.models import Entree, Arsenal
+from meals.forms import EntreeForm
 
 def home_page(request):
-	return render(request, 'home.html')
+	return render(request, 'home.html', {'form': EntreeForm()})
 
 def view_arsenal(request, arsenal_id):
 	ars = Arsenal.objects.get(id=arsenal_id)
