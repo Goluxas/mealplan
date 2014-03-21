@@ -21,3 +21,7 @@ class EntreeForm(forms.models.ModelForm):
 		error_messages = {
 				'name': {'required': EMPTY_ENTREE_ERROR},
 			}
+
+	def save(self, for_arsenal):
+		self.instance.arsenal = for_arsenal
+		return super().save()

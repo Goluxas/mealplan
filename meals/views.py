@@ -15,7 +15,7 @@ def view_arsenal(request, arsenal_id):
 	if request.method == 'POST':
 		form = EntreeForm(request.POST)
 		if form.is_valid():
-			Entree.objects.create(name=request.POST['name'], arsenal=ars)
+			form.save(for_arsenal=ars)
 			return redirect(ars)
 
 	return render(request, 'arsenal.html', {
@@ -27,7 +27,7 @@ def new_arsenal(request):
 	form = EntreeForm(data=request.POST)
 	if form.is_valid():
 		ars = Arsenal.objects.create()
-		Entree.objects.create(name=request.POST['name'], arsenal=ars)
+		form.save(for_arsenal=ars)
 		return redirect(ars)
 	else:
 		return render(request, 'home.html', {'form':form})
