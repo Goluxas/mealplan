@@ -2,6 +2,7 @@ from django.core.urlresolvers import resolve
 from django.test import TestCase
 from django.http import HttpRequest
 from django.template.loader import render_to_string
+from django.utils.html import escape
 
 from meals.views import home_page
 from meals.models import Entree, Arsenal
@@ -70,6 +71,16 @@ class ArsenalViewTest(TestCase):
 
 		self.assertRedirects(response, '/meals/%d/' % (correct_ars.id))
 
+	def test_validation_errors_end_up_on_arsenal_page(self):
+		ars = Arsenal.objects.create()
+		response = self.client.post('/meals/%d/' % (ars.id),
+									data={'entree_name': ''})
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'arsenal.html')
+		expected_error = escape('Entree names must not be blank')
+		self.assertContains(response, expected_error)
+
 
 class NewArsenalTest(TestCase):
 
@@ -90,7 +101,7 @@ class NewArsenalTest(TestCase):
 		response = self.client.post('/meals/new', data={'entree_name':''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'home.html')
-		expected_error = 'Entree names must not be blank'
+		expected_error = escape('Entree names must not be blank')
 		self.assertContains(response, expected_error)
 
 	def test_invalid_entrees_are_not_saved(self):

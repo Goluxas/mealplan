@@ -9,11 +9,20 @@ def home_page(request):
 
 def view_arsenal(request, arsenal_id):
 	ars = Arsenal.objects.get(id=arsenal_id)
+	error = None
+
 	if request.method == 'POST':
-		Entree.objects.create(name=request.POST['entree_name'], arsenal=ars)
-		return redirect('/meals/%d/' % (ars.id))
+		entree = Entree(name=request.POST['entree_name'], arsenal=ars)
+		try:
+			entree.full_clean()
+			entree.save()
+			return redirect('/meals/%d/' % (ars.id))
+		except ValidationError:
+			error = 'Entree names must not be blank'
+
 	return render(request, 'arsenal.html', {
 				'arsenal': ars,
+				'error': error,
 			})
 
 def new_arsenal(request):
