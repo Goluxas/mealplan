@@ -41,3 +41,17 @@ class EntreeValidationTest(FunctionalTest):
 
 		self.check_for_row_in_entree_table('some text (entree)')
 		self.check_for_row_in_entree_table('some different text (entree)')
+	
+	def test_cannot_add_duplicate_entrees(self):
+		# Mallory goes to the home page and starts a new arsenal
+		self.browser.get(self.server_url)
+		self.get_entree_input_box().send_keys('Milk steak\n')
+		self.check_for_row_in_entree_table('Milk steak (entree)')
+
+		# She accidentally tries to enter it again
+		self.get_entree_input_box().send_keys('Milk steak\n')
+
+		# She sees a helpful error message
+		self.check_for_row_in_entree_table('Milk steak (entree)')
+		error = self.browser.find_element_by_css_selector('.has-error')
+		self.assertEqual(error.name, 'Entree already added')

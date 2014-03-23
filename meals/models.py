@@ -9,3 +9,9 @@ class Arsenal(models.Model):
 class Entree(models.Model):
 	name = models.TextField()
 	arsenal = models.ForeignKey(Arsenal)
+
+	class Meta:
+		unique_together = ('arsenal', 'name')
+
+	def __str__(self):
+		return self.name
