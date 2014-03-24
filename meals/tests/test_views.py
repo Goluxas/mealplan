@@ -102,6 +102,18 @@ class ArsenalViewTest(TestCase):
 
 		self.assertContains(response, EMPTY_ENTREE_ERROR)
 
+	from unittest import skip
+	@skip
+	def test_duplicate_entree_validation_errors_end_up_on_arsenal_page(self):
+		ars = Arsenal.objects.create()
+		ent = Entree.objects.create(name='test', arsenal=ars)
+		response = self.client.post('/meals/%d/' % (ars.id),
+									data={'name': 'test'})
+		expected_error = escape('Entree already added')
+
+		self.assertContains(response, expected_error)
+		self.assertTemplateUsed(response, 'arsenal.html')
+		self.assertEqual(Entree.objects.all().count(), 1)
 
 class NewArsenalTest(TestCase):
 

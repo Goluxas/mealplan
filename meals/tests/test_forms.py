@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from meals.forms import EntreeForm, EMPTY_ENTREE_ERROR
+from meals.forms import EntreeForm, ExistingArsenalEntreeForm, EMPTY_ENTREE_ERROR, DUPLICATE_ENTREE_ERROR
 from meals.models import Arsenal, Entree
 
 
@@ -26,3 +26,26 @@ class EntreeFormTest(TestCase):
 		self.assertEqual(new_entree, Entree.objects.first())
 		self.assertEqual(new_entree.name, 'test')
 		self.assertEqual(new_entree.arsenal, ars)
+
+class ExistingArsenalEntreeFormTest(TestCase):
+
+	def test_form_renders_entree_name_input(self):
+		ars = Arsenal.objects.create()
+		form = ExistingArsenalEntreeForm(for_arsenal=ars)
+
+		self.assertIn('placeholder="Enter an entree"', form.as_p())
+
+	def test_form_validation_for_blank_entrees(self):
+		ars = Arsenal.objects.create()
+		form = ExistingArsenalEntreeForm(for_arsenal=ars, data={'name': ''})
+
+		self.assertFalse(form.is_valid())
+		self.assertEqual(form.errors['name'], [EMPTY_ENTREE_ERROR])
+
+	def test_form_validation_for_duplicate_entrees(self):
+		ars = Arsenal.objects.create()
+		Entree.objects.create(arsenal=ars, name='no twins')
+		form = ExistingArsenalEntreeForm(for_arsenal=ars, data={'name': 'no twins'})
+
+		self.assertFalse(form.is_valid())
+		self.assertEqual(form.errors['name'], [DUPLICATE_ENTREE_ERROR])
