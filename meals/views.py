@@ -3,19 +3,19 @@ from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 
 from meals.models import Entree, Arsenal
-from meals.forms import EntreeForm
+from meals.forms import EntreeForm, ExistingArsenalEntreeForm
 
 def home_page(request):
 	return render(request, 'home.html', {'form': EntreeForm()})
 
 def view_arsenal(request, arsenal_id):
 	ars = Arsenal.objects.get(id=arsenal_id)
-	form = EntreeForm()
+	form = ExistingArsenalEntreeForm(for_arsenal=ars)
 
 	if request.method == 'POST':
-		form = EntreeForm(request.POST)
+		form = ExistingArsenalEntreeForm(for_arsenal=ars, data=request.POST)
 		if form.is_valid():
-			form.save(for_arsenal=ars)
+			form.save()
 			return redirect(ars)
 
 	return render(request, 'arsenal.html', {

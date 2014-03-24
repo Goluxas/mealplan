@@ -49,3 +49,10 @@ class ExistingArsenalEntreeFormTest(TestCase):
 
 		self.assertFalse(form.is_valid())
 		self.assertEqual(form.errors['name'], [DUPLICATE_ENTREE_ERROR])
+
+	def test_form_save(self):
+		ars = Arsenal.objects.create()
+		form = ExistingArsenalEntreeForm(for_arsenal=ars, data={'name': 'hi'})
+		new_entree = form.save()
+		
+		self.assertEqual(new_entree, Entree.objects.all()[0])

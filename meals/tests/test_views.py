@@ -6,7 +6,7 @@ from django.utils.html import escape
 
 from meals.views import home_page
 from meals.models import Entree, Arsenal
-from meals.forms import EntreeForm, EMPTY_ENTREE_ERROR
+from meals.forms import EntreeForm, ExistingArsenalEntreeForm, EMPTY_ENTREE_ERROR, DUPLICATE_ENTREE_ERROR
 
 class HomePageTest(TestCase):
 	
@@ -74,7 +74,7 @@ class ArsenalViewTest(TestCase):
 		ars = Arsenal.objects.create()
 		response = self.client.get('/meals/%d/' % (ars.id))
 		
-		self.assertIsInstance(response.context['form'], EntreeForm)
+		self.assertIsInstance(response.context['form'], ExistingArsenalEntreeForm)
 		self.assertContains(response, 'name="name"')
 
 	def post_invalid_input(self):
@@ -95,21 +95,19 @@ class ArsenalViewTest(TestCase):
 	def test_for_invalid_input_passes_form_to_template(self):
 		response = self.post_invalid_input()
 
-		self.assertIsInstance(response.context['form'], EntreeForm)
+		self.assertIsInstance(response.context['form'], ExistingArsenalEntreeForm)
 
 	def test_for_invalid_input_shows_error_on_page(self):
 		response = self.post_invalid_input()
 
 		self.assertContains(response, EMPTY_ENTREE_ERROR)
 
-	from unittest import skip
-	@skip
 	def test_duplicate_entree_validation_errors_end_up_on_arsenal_page(self):
 		ars = Arsenal.objects.create()
 		ent = Entree.objects.create(name='test', arsenal=ars)
 		response = self.client.post('/meals/%d/' % (ars.id),
 									data={'name': 'test'})
-		expected_error = escape('Entree already added')
+		expected_error = escape(DUPLICATE_ENTREE_ERROR)
 
 		self.assertContains(response, expected_error)
 		self.assertTemplateUsed(response, 'arsenal.html')

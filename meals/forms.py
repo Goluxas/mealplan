@@ -41,3 +41,6 @@ class ExistingArsenalEntreeForm(EntreeForm):
 		except ValidationError as e:
 			e.error_dict = {'name': [DUPLICATE_ENTREE_ERROR]}
 			self._update_errors(e)
+
+	def save(self):
+		return forms.models.ModelForm.save(self)

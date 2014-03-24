@@ -54,4 +54,4 @@ class EntreeValidationTest(FunctionalTest):
 		# She sees a helpful error message
 		self.check_for_row_in_entree_table('Milk steak (entree)')
 		error = self.browser.find_element_by_css_selector('.has-error')
-		self.assertEqual(error.name, 'Entree already added')
+		self.assertEqual(error.text, 'Entree already added')
