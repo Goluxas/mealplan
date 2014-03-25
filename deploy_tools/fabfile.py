@@ -51,5 +51,5 @@ def _update_static_files(source_folder):
 		source_folder))
 
 def _update_database(source_folder):
-	run('cd %s && ../virtualenv/bin/python manage.py syncdb --noinput' % (
+	run('cd %s && ../virtualenv/bin/python manage.py syncdb --migrate --noinput' % (
 		source_folder))
